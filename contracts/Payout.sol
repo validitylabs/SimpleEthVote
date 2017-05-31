@@ -7,21 +7,23 @@ contract Payout {
 
     event PaidOutVoter(address voter, uint amount);
 
-    function Payout(address VoteFactoryAddress) {
-        myVoteFactory = VoteFactory(myVoteFactory);
+    function setVoteFactory(address voteFactoryAddress) {
+        // allows corresponding voteFactory to be set exactly once
+        // removed this from the constructor to allow for easier code verification on etherscan
+        // (constructor arguments currently have to be hex encoded and padded)
+        assert(myVoteFactory == address(0));
+        myVoteFactory = VoteFactory(voteFactoryAddress);
     }
 
     mapping(uint => uint) payoutAmount; // payout per round
     mapping(address => mapping(uint => bool)) requestedPayout;
 
     function () payable {
-        uint numPolls = myVoteFactory.numPolls();
 
-        if (payoutAmount[numPolls] == 0)
-            payoutAmount[numPolls] == this.balance;
-            
         // if previous round is over:
         if (myVoteFactory.nextEndTime() < now) {
+            uint numPolls = myVoteFactory.numPolls();
+            setPayoutAmount();
             // pay out to all, unless we have too many voters (very expensive call that might run into block gas limit limitations)
             uint maxNumVotersToPayDirectly = 20;
             if (myVoteFactory.numVoters(numPolls) < maxNumVotersToPayDirectly) {
@@ -35,8 +37,16 @@ contract Payout {
             }
         }
     }
+    
+    function setPayoutAmount() internal {
+        // before attempting to pay out anyone we should set the total payout amount
+        uint numPolls = myVoteFactory.numPolls();
+        if (payoutAmount[numPolls] == 0)
+            payoutAmount[numPolls] == this.balance;
+    }
 
     function payOutVoterById(uint voterId) {
+        setPayoutAmount();
         uint numPolls = myVoteFactory.numPolls();
 
         // check for array out of bounds
@@ -47,6 +57,7 @@ contract Payout {
     }
 
     function payOutVoterByAddress(address voter) {
+        setPayoutAmount();
         uint numPolls = myVoteFactory.numPolls();
         assert(myVoteFactory.hasVoted(voter, numPolls));
         assert(!requestedPayout[voter][numPolls]);

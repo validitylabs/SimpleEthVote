@@ -8,6 +8,7 @@ contract VoteFactory {
     uint public nextEndTime;
     Vote public yesContract;
     Vote public noContract;
+    mapping(uint => string) public voteDescription;
     mapping(address => mapping(uint => bool)) public hasVoted;
     mapping(uint => uint) public numVoters; // number of voters per round
     mapping(uint => mapping(uint => address)) public voter; // [voteId][voterNumber] => address
@@ -15,7 +16,7 @@ contract VoteFactory {
     mapping(uint => uint) public noCount;
     
     event transferredOwner(address newOwner);
-    event startedNewVote(address initiator, uint duration, uint voteId);
+    event startedNewVote(address initiator, uint duration, string description, uint voteId);
     event voted(address voter, bool isYes);
     
     modifier onlyOwner {
@@ -35,6 +36,7 @@ contract VoteFactory {
     }
     
     function VoteFactory() {
+        owner = msg.sender;
         // constructor deploys yes and no contract
         yesContract = new Vote();
         noContract = new Vote();
@@ -42,40 +44,47 @@ contract VoteFactory {
 
     function() payable {
         // default function starts new poll if previous poll is over for at least 10 minutes
-        if (nextEndTime > now + 10 minutes)
-            startNewVote(10 minutes);
+        if (nextEndTime < now + 10 minutes)
+            startNewVote(10 minutes, "Vote on tax reimbursements");
     }
     
-    function newVote(uint duration) onlyOwner {
+    function newVote(uint duration, string description) onlyOwner {
         // only admin is able to start vote with arbitrary duration
-        startNewVote(duration);
+        startNewVote(duration, description);
     }
     
-    function startNewVote(uint duration) internal {
+    function startNewVote(uint duration, string description) internal {
         // do not allow to start new vote if there's still something ongoing
         if (now <= nextEndTime)
             throw;
         nextEndTime = now + duration;
-        startedNewVote(msg.sender, duration, ++numPolls);
+        voteDescription[numPolls] = description;
+        startedNewVote(msg.sender, duration, description, ++numPolls);
     }
     
-    function vote(bool isYes) {
+    function vote(bool isYes, address voteSender) {
+        
+        // voting should just be able via voting contract (use them as SWIS contracts)
+        if (msg.sender != address(yesContract) && msg.sender != address(noContract))
+            throw;
+
         // throw if time is over
         if (now > nextEndTime)
             throw;
             
         // throw if sender has already voted before
-        if (hasVoted[msg.sender][numPolls])
+        if (hasVoted[voteSender][numPolls])
             throw;
         
-        hasVoted[msg.sender][numPolls] = true;
+        hasVoted[voteSender][numPolls] = true;
+        voter[numPolls][numVoters[numPolls]++] = voteSender;
         
         if (isYes)
             yesCount[numPolls]++;
         else
             noCount[numPolls]++;
 
-        voted(msg.sender, isYes);
+        voted(voteSender, isYes);
     }
 }
 
