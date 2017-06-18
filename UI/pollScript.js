@@ -78,7 +78,7 @@ $(window).on('load', function() {
             return;
         }
         console.log('yes contract: ' + val);
-        $('#yesTd').qrcode({ text: val });
+        $('#yesQrContainer').qrcode(val);
     });
 
     contract.noContract((error, val) => {
@@ -87,7 +87,7 @@ $(window).on('load', function() {
             return;
         }
         console.log('no contract: ' + val);
-        $('#noTd').qrcode({ text: val });
+        $('#noQrContainer').qrcode(val);
     });
 });
 
