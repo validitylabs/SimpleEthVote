@@ -4,9 +4,11 @@ TODO:
 - use event handlers
 */
 
-//console.log(JSON.stringify(web3));
+// globals vars that hold some of the contract state to be consumed by the UI
 var yesCount = 0;
 var noCount = 0;
+var voteDescription = 0;
+
 var contract = {};
 var numPolls = 0;
 var blockchainExplorerBaseUrl = 'https://ropsten.etherscan.io/address/';
@@ -31,8 +33,11 @@ $(window).on('load', function() {
         numPolls = val.toNumber();
     
         contract.nextEndTime((error, val) => {
+            if (error) {
+                console.log('error: ' + error);
+                return;
+            }
             nextEndTime = val.toNumber();
-            console.log('error: ' + error);
             console.log(nextEndTime + ' (end time)');
             var t1;
             var t2;
@@ -81,11 +86,13 @@ $(window).on('load', function() {
             console.log('error getting number of polls: ' + error);
             return;
         }
-        contract.voteDescription(parseInt(numPolls), (error, voteDescription) => {
+        contract.voteDescription(parseInt(numPolls), (error, voteDesc) => {
+            voteDescription = voteDesc;
             if (error) {
                 console.log('error getting vote description: ' + error);
                 return;
             }
+            console.log('Vote description: ' + voteDescription);
             $('#description').text('Poll number ' + numPolls + ': ' + voteDescription);
         });
     })
@@ -121,13 +128,16 @@ $(window).on('load', function() {
 
 function renderContractData() {
     // TODO: this should be unwrapped into async.waterfall
-    contract.yesCount(numPolls, (error, val) => {
-        yesCount = val.toNumber();
+    contract.yesCount(numPolls, function(error, yesCountString) {
+        yesCount = yesCountString.toNumber();
         console.log('error: ' + error + ', yesCount: ' + yesCount);
-        contract.noCount(numPolls, (error, val) => {
-            noCount = val.toNumber();
+        contract.noCount(numPolls, function(error, noCountString) {
+            noCount = noCountString.toNumber();
             console.log('error: ' + error + ', noCount: ' + noCount);
-            adjustUI();
+            contract.voteDescription(numPolls, function(error, voteDesc){
+                voteDescription = voteDesc;
+                adjustUI();
+            });
         });
     });
 }
@@ -141,23 +151,14 @@ function adjustUI() {
         console.log('new heights - yes: ' + newYesHeight + ', no: ' + newNoHeight);
         $('#yesBar').animate({
             height: newYesHeight + 'px'
-        }, 1000)
+        }, 1000);
         $('#noBar').animate({
             height: newNoHeight + 'px'
-        }, 1000)
+        }, 1000);
+        $('#description').text('Poll number ' + numPolls + ': ' + voteDescription);
         setTimeout(() => {
             $('#noText').text('NO (' + noCount + ' votes)');
             $('#yesText').text('YES (' + yesCount + ' votes)');
         }, 1000);
    }
 }
-/*
-check if poll is currently ongoing (compare game endtime to some time that we e.g. get via geth)
-if poll is ongoing diplay timer
-if no poll is ongoing diplay button to start new poll
-if poll is ongoing, keep polling for new data every 2s:
-  - update bars
-  - update numbers yes/no
-  - update voter list
-- 
-*/
