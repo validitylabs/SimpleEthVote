@@ -86,7 +86,8 @@ $(window).on('load', function() {
             console.log('error getting number of polls: ' + error);
             return;
         }
-        contract.voteDescription(parseInt(numPolls), (error, voteDesc) => {
+        // TODO: the -1 is arguably a bug in the smart contract
+        contract.voteDescription(parseInt(numPolls - 1), (error, voteDesc) => {
             voteDescription = voteDesc;
             if (error) {
                 console.log('error getting vote description: ' + error);
