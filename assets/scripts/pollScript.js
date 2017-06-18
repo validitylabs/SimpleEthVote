@@ -110,6 +110,7 @@ $(window).on('load', function() {
     });
 
     $('#voteFactoryHeader').click(function() {
+        alert('clicked');
         $('#voteFactoryAddress').toggle(750);
     });
 
