@@ -155,8 +155,8 @@ function adjustUI() {
         }, 1000);
         //$('#description').text('Poll number ' + numPolls + ': ' + voteDescription);
         setTimeout(() => {
-            $('#noText').text('NO (' + noCount + ' votes)');
-            $('#yesText').text('YES (' + yesCount + ' votes)');
+            $('#noText').html('<h2>NO</h2> (' + noCount + ' votes)');
+            $('#yesText').html('<h2>YES</h2> (' + yesCount + ' votes)');
         }, 1000);
    }
 }
