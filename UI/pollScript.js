@@ -110,9 +110,10 @@ $(window).on('load', function() {
 
     $('#voteFactoryAddress').click(function() {
         $('#voteFactoryAddress').toggle(750);
-    })
-    $('#voteFactoryAddress').html('address: <a href=\'' + blockchainExplorerBaseUrl + address + '\'>' + address + '</a>');
-    
+    });
+
+    $('#voteFactoryAddress').html('address: <a href=\'' + blockchainExplorerBaseUrl + contractAddress + '\'>' + contractAddress + '</a>');
+    $('#voteFactoryAddress').qrcode(contractAddress);
 });
 
 function getContractData() {
