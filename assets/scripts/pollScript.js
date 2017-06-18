@@ -115,7 +115,7 @@ $(window).on('load', function() {
 
     $('#voteFactoryAddress').html('address: <a href=\'' + blockchainExplorerBaseUrl + contractAddress + '\'>' + contractAddress + '</a>');
 
-    $('#voteFactoryAddress').qrcode(contractAddress);
+    //$('#voteFactoryAddress').qrcode(contractAddress);
 });
 
 function getContractData() {
