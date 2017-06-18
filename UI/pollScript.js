@@ -6,6 +6,7 @@ TODO:
 - check if contract available, warning if not
 - get latest state (poll number, num yes and no)
 */
+
 //console.log(JSON.stringify(web3));
 var yesCount = 0;
 var noCount = 0;
