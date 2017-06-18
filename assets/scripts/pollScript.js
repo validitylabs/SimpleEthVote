@@ -1,10 +1,7 @@
 /*
 TODO:
-- insert async
-- insert jquery
-- check if web3 available, popup error otherwise
-- check if contract available, warning if not
-- get latest state (poll number, num yes and no)
+- use async
+- use event handlers
 */
 
 //console.log(JSON.stringify(web3));
@@ -41,10 +38,11 @@ $(window).on('load', function() {
             var t2;
             var now = Math.floor(Date.now() / 1000);
             console.log(now + ' (now)');
+            renderContractData();
             if (nextEndTime > now) {
-                getContractData();
+                // TODO: this should not poll the contract but work with event listeners!
                 t1 = setInterval(() => {
-                    getContractData();
+                    renderContractData();
                 }, 3000);
 
 
@@ -56,16 +54,16 @@ $(window).on('load', function() {
 
                     // Find the distance between now an the count down date
                     var distance = nextEndTime - now;
-                    console.log(distance + ' (distance)');
+                    //console.log(distance + ' (distance)');
 
-                    // Time calculations for days, hours, minutes and seconds
+                    // Time calculations for minutes and seconds
                     var minutes = Math.floor((distance % (60 * 60)) / (60));
                     var seconds = Math.floor((distance % (60)));
 
                     // Display the result in the element with id="demo"
-                    $('#description').text(minutes + ":" + seconds);
+                    $('#votingTimer').text(minutes + ":" + String("0" + seconds).slice(-2));
                     if(distance <= 0) {
-                        $('#description').text('Voting period is over!');
+                        $('#votingTimer').text('Voting period is over!');
                         clearInterval(t1);
                         clearInterval(t2);
                     }
@@ -96,7 +94,7 @@ $(window).on('load', function() {
         }
         console.log('yes contract: ' + address);
         $('#yesQrContainer').qrcode(address);
-        $('#yesText').html('address: <a href=\'' + blockchainExplorerBaseUrl + address + '\'>' + address + '</a>');
+        $('#yesAddress').html('address: <a href=\'' + blockchainExplorerBaseUrl + address + '\'>' + address + '</a>');
     });
 
     contract.noContract((error, address) => {
@@ -106,7 +104,7 @@ $(window).on('load', function() {
         }
         console.log('no contract: ' + address);
         $('#noQrContainer').qrcode(address);
-        $('#noText').html('address: <a href=\'' + blockchainExplorerBaseUrl + address + '\'>' + address + '</a>');
+        $('#noAddress').html('address: <a href=\'' + blockchainExplorerBaseUrl + address + '\'>' + address + '</a>');
     });
 
     $('#voteFactoryHeader').click(function() {
@@ -118,7 +116,8 @@ $(window).on('load', function() {
     $('#voteFactoryAddress').qrcode(contractAddress);
 });
 
-function getContractData() {
+function renderContractData() {
+    // TODO: this should be unwrapped into async.waterfall
     contract.yesCount(numPolls, (error, val) => {
         yesCount = val.toNumber();
         console.log('error: ' + error + ', yesCount: ' + yesCount);
