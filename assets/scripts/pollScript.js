@@ -135,11 +135,7 @@ function renderContractData() {
         contract.noCount(numPolls, function(error, noCountString) {
             noCount = noCountString.toNumber();
             console.log('error: ' + error + ', noCount: ' + noCount);
-            contract.voteDescription(numPolls, function(error, voteDesc){
-                console.log('vote description: ' + voteDesc);
-                voteDescription = voteDesc;
-                adjustUI();
-            });
+            adjustUI();
         });
     });
 }
