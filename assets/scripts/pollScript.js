@@ -69,6 +69,9 @@ $(window).on('load', function() {
                     }
                 }, 1000);
             }
+            else {
+                $('#votingTimer').text('Voting period is over!');
+            }
 
         });
     });
@@ -111,7 +114,7 @@ $(window).on('load', function() {
         $('#voteFactoryAddress').toggle(700);
     });
 
-    $('#voteFactoryAddress').html('address: <a href=\'' + blockchainExplorerBaseUrl + contractAddress + '\'>' + contractAddress + '</a>');
+    $('#voteFactoryAddress').html('address: <a href=\'' + blockchainExplorerBaseUrl + contractAddress + '\'>' + contractAddress + '</a><br>');
 
     $('#voteFactoryAddress').qrcode(contractAddress);
 });
