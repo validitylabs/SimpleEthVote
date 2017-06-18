@@ -153,7 +153,7 @@ function adjustUI() {
         $('#noBar').animate({
             height: newNoHeight + 'px'
         }, 1000);
-        $('#description').text('Poll number ' + numPolls + ': ' + voteDescription);
+        //$('#description').text('Poll number ' + numPolls + ': ' + voteDescription);
         setTimeout(() => {
             $('#noText').text('NO (' + noCount + ' votes)');
             $('#yesText').text('YES (' + yesCount + ' votes)');
