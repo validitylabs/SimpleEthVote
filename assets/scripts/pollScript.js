@@ -109,7 +109,7 @@ $(window).on('load', function() {
         $('#noText').html('address: <a href=\'' + blockchainExplorerBaseUrl + address + '\'>' + address + '</a>');
     });
 
-    $('#voteFactoryAddress').click(function() {
+    $('#voteFactoryHeader').click(function() {
         $('#voteFactoryAddress').toggle(750);
     });
 
