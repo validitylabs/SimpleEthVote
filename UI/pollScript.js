@@ -16,9 +16,13 @@ $(window).on('load', function() {
     if (web3 === undefined)
         alert('Could not find web3 Object. Make sure you are using the Chrome browser and have the MetaMask extension installed or try compatible options.');
 
-    // address of the VoteManager contract
-    var contractAddress = '0x0B6F6E073A08AB8Fd458527C47eD83982FF26851';
+    // address of the VoteFactory contract
+    //var contractAddress = '0x0B6F6E073A08AB8Fd458527C47eD83982FF26851'; // main net - same version???
+    var contractAddress = '0xf8744e4675a9a8aCa068876564cB58F1C9E77aDf'; // Ropsten test net
     var contractABI = [{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"voteDescription","outputs":[{"name":"","type":"string"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"yesCount","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"},{"name":"","type":"uint256"}],"name":"hasVoted","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"newOwner","type":"address"}],"name":"transferOwner","outputs":[],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"duration","type":"uint256"},{"name":"description","type":"string"}],"name":"newVote","outputs":[],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"isYes","type":"bool"},{"name":"voteSender","type":"address"}],"name":"vote","outputs":[],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"numPolls","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"owner","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"numVoters","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"noContract","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"noCount","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[],"name":"payOut","outputs":[],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"yesContract","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"},{"name":"","type":"uint256"}],"name":"voter","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"nextEndTime","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"inputs":[],"payable":false,"type":"constructor"},{"payable":true,"type":"fallback"},{"anonymous":false,"inputs":[{"indexed":false,"name":"newOwner","type":"address"}],"name":"transferredOwner","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"initiator","type":"address"},{"indexed":false,"name":"duration","type":"uint256"},{"indexed":false,"name":"description","type":"string"},{"indexed":false,"name":"voteId","type":"uint256"}],"name":"startedNewVote","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"voter","type":"address"},{"indexed":false,"name":"isYes","type":"bool"}],"name":"voted","type":"event"}];
+
+    // main net corresponding ABI:
+    //var contractABI = [{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"voteDescription","outputs":[{"name":"","type":"string"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"yesCount","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"","type":"address"},{"name":"","type":"uint256"}],"name":"hasVoted","outputs":[{"name":"","type":"bool"}],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"newOwner","type":"address"}],"name":"transferOwner","outputs":[],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"duration","type":"uint256"},{"name":"description","type":"string"}],"name":"newVote","outputs":[],"payable":false,"type":"function"},{"constant":false,"inputs":[{"name":"isYes","type":"bool"},{"name":"voteSender","type":"address"}],"name":"vote","outputs":[],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"numPolls","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"owner","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"numVoters","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"noContract","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"}],"name":"noCount","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"constant":false,"inputs":[],"name":"payOut","outputs":[],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"yesContract","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":true,"inputs":[{"name":"","type":"uint256"},{"name":"","type":"uint256"}],"name":"voter","outputs":[{"name":"","type":"address"}],"payable":false,"type":"function"},{"constant":true,"inputs":[],"name":"nextEndTime","outputs":[{"name":"","type":"uint256"}],"payable":false,"type":"function"},{"inputs":[],"payable":false,"type":"constructor"},{"payable":true,"type":"fallback"},{"anonymous":false,"inputs":[{"indexed":false,"name":"newOwner","type":"address"}],"name":"transferredOwner","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"initiator","type":"address"},{"indexed":false,"name":"duration","type":"uint256"},{"indexed":false,"name":"description","type":"string"},{"indexed":false,"name":"voteId","type":"uint256"}],"name":"startedNewVote","type":"event"},{"anonymous":false,"inputs":[{"indexed":false,"name":"voter","type":"address"},{"indexed":false,"name":"isYes","type":"bool"}],"name":"voted","type":"event"}];
     contract = web3.eth.contract(contractABI).at(contractAddress);
 
     numPolls = 0;
@@ -66,6 +70,24 @@ $(window).on('load', function() {
             }
 
         });
+    });
+
+    contract.yesContract((error, val) => {
+        if (error) {
+            console.log('error getting yes contract: ' + error);
+            return;
+        }
+        console.log('yes contract: ' + val);
+        $('#yesTd').qrcode({ text: val });
+    });
+
+    contract.noContract((error, val) => {
+        if (error) {
+            console.log('error getting no contract: ' + error);
+            return;
+        }
+        console.log('no contract: ' + val);
+        $('#noTd').qrcode({ text: val });
     });
 });
 
