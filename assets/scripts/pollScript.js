@@ -110,13 +110,12 @@ $(window).on('load', function() {
     });
 
     $('#voteFactoryHeader').click(function() {
-        alert('clicked');
         $('#voteFactoryAddress').toggle(750);
     });
 
     $('#voteFactoryAddress').html('address: <a href=\'' + blockchainExplorerBaseUrl + contractAddress + '\'>' + contractAddress + '</a>');
 
-    //$('#voteFactoryAddress').qrcode(contractAddress);
+    $('#voteFactoryAddress').qrcode(contractAddress);
 });
 
 function getContractData() {
