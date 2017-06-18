@@ -108,7 +108,7 @@ $(window).on('load', function() {
     });
 
     $('#voteFactoryHeader').click(function() {
-        $('#voteFactoryAddress').toggle(750);
+        $('#voteFactoryAddress').toggle(700);
     });
 
     $('#voteFactoryAddress').html('address: <a href=\'' + blockchainExplorerBaseUrl + contractAddress + '\'>' + contractAddress + '</a>');
